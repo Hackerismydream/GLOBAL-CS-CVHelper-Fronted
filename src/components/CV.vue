@@ -24,66 +24,82 @@
 
   <el-row>
     <el-col :span="12">
-      <div>
+      <el-space direction="vertical">
+      <el-card class="box-card" style="width: 800px">
+        <template #header>
+          <div class="card-header">
+            <h2>推荐项目</h2>
+          </div>
+          <div v-for="school in recommend_project" :key="school.name">
+            <h2 class="project-name">{{ school.name }}</h2>
+            <div class="project-section">
+              <h3 class="section-title">项目介绍</h3>
+              <ul class="item-list">
+                <li v-for="(value, key) in school.项目介绍" :key="key">
+                  <span class="item-key">{{ key }}:</span>
+                  <span class="item-value">{{ value }}</span>
+                </li>
+              </ul>
+            </div>
+            <div class="project-section">
+              <h3 class="section-title">注意事项</h3>
+              <div class="sub-notes">
+                <h4 class="subsection-title">网申注意事项</h4>
+                <ul class="item-list">
+                  <li v-for="item in school.注意事项.网申注意事项" :key="item">{{ item }}</li>
+                </ul>
+              </div>
+              <div class="sub-notes">
+                <h4 class="subsection-title">其他注意事项</h4>
+                <ul class="item-list">
+                  <li v-for="item in school.注意事项.其他注意事项" :key="item">{{ item }}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="project-section">
+              <h3 class="section-title">项目优劣势</h3>
+              <div class="sub-pros-cons">
+                <h4 class="subsection-title">Pros:</h4>
+                <ul class="item-list">
+                  <li v-for="item in school.项目优劣势.Pros" :key="item">{{ item }}</li>
+                </ul>
+              </div>
+              <div class="sub-pros-cons">
+                <h4 class="subsection-title">Cons:</h4>
+                <ul class="item-list">
+                  <li v-for="item in school.项目优劣势.Cons" :key="item">{{ item }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+
+        </template>
         <h2>推荐理由</h2>
-        <ul class="item-list">
-          <li v-for="item in recommend_reson" :key="item">{{ item }}</li>
-        </ul>
-      </div>
-      <h2>推荐项目</h2>
-      <div class="project-container">
-        <div
-            class="school-container"
-            v-for="school in recommend_project"
-            :key="school.name"
-        >
-          <h2 class="project-name">{{ school.name }}</h2>
-          <div class="project-section">
-            <h3 class="section-title">项目介绍</h3>
-            <ul class="item-list">
-              <li v-for="(value, key) in school.项目介绍" :key="key">
-                <span class="item-key">{{ key }}:</span>
-                <span class="item-value">{{ value }}</span>
-              </li>
-            </ul>
-          </div>
-          <div class="project-section">
-            <h3 class="section-title">注意事项</h3>
-            <div class="sub-notes">
-              <h4 class="subsection-title">网申注意事项</h4>
-              <ul class="item-list">
-                <li v-for="item in school.注意事项.网申注意事项" :key="item">{{ item }}</li>
-              </ul>
-            </div>
-            <div class="sub-notes">
-              <h4 class="subsection-title">其他注意事项</h4>
-              <ul class="item-list">
-                <li v-for="item in school.注意事项.其他注意事项" :key="item">{{ item }}</li>
-              </ul>
-            </div>
-          </div>
-          <div class="project-section">
-            <h3 class="section-title">项目优劣势</h3>
-            <div class="sub-pros-cons">
-              <h4 class="subsection-title">Pros:</h4>
-              <ul class="item-list">
-                <li v-for="item in school.项目优劣势.Pros" :key="item">{{ item }}</li>
-              </ul>
-            </div>
-            <div class="sub-pros-cons">
-              <h4 class="subsection-title">Cons:</h4>
-              <ul class="item-list">
-                <li v-for="item in school.项目优劣势.Cons" :key="item">{{ item }}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+        <div v-for="item in recommend_reson" :key="item">{{ item }}</div>
+      </el-card>
+      </el-space>
     </el-col>
-<!--    ————————————注意这里，上面代码是左侧分栏部分，下面代码是右侧分栏部分——————————-->
+    <!--    ————————————注意这里，上面代码是左侧分栏部分，下面代码是右侧分栏部分——————————-->
     <el-col :span="11" :offset="1">
-      简历预览
-      针对简历AI面试官给你提出的问题
+
+
+      <el-card class="box-card" style="width: 800px">
+        <h2>您的简历</h2>
+        <embed v-if="selectedResume" :src="selectedResume" type="application/pdf" width="80%" height="500px">
+        <!-- 添加<embed>元素来显示选中的简历文件 -->
+      </el-card>
+
+      <el-card v-for="(value, key) in question" :key="key" class="box-card" style="width: 800px">
+
+        <template #header>
+          <div class="card-header">
+            <h2>{{ key }}</h2>
+          </div>
+          <li v-for="items in value" :key="items"> {{items}}</li>
+        </template>
+        <!-- 添加<embed>元素来显示选中的简历文件 -->
+      </el-card>
     </el-col>
   </el-row>
 
@@ -98,6 +114,8 @@ export default {
       result: [], // 存储后端接口返回的数据
       recommend_project: [],
       recommend_reson: [],
+      question:[],
+      selectedResume: '', // 存储简历的预览内容
     };
   },
   computed: {
@@ -110,6 +128,7 @@ export default {
   },
   methods: {
     handleRemove(file, fileList) {
+      this.selectedResume = URL.createObjectURL(file.raw); // 存储选中的简历文件的URL
       console.log(file, fileList);
     },
     handlePreview(file) {
@@ -143,6 +162,20 @@ export default {
           })
           .catch(error => {
             console.error('上传失败:', error);
+            this.loading = false; // 隐藏加载状态
+          });
+
+      fetch('http://127.0.0.1:8000/questions/', {
+        method: 'POST',
+        body: formData,
+      })
+          .then(response => response.json())
+          .then(data => {
+            // 处理从后端接收到的数据
+            this.question = data;
+          })
+          .catch(error => {
+            console.error('请求失败:', error);
             this.loading = false; // 隐藏加载状态
           });
 
